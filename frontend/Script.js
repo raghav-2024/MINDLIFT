@@ -1,7 +1,7 @@
 /************************
   API CONFIG
 *************************/
-const API = "http://localhost:5000/api/auth";
+const API_URL = "https://mindlift-3zmr.onrender.com";
 
 /************************
   REGISTER & LOGIN
@@ -13,7 +13,7 @@ async function register() {
 
   if (!name || !phone || !password) return alert("Please fill all fields");
 
-  const res = await fetch(`${API}/register`, {
+  const res = await fetch(`${API_URL}/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ name, phone, password })
