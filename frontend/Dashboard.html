@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MINDLIFT Dashboard</title>
+<link rel="stylesheet" href="style.css">
+<script>
+if(!localStorage.getItem("username")){
+    window.location.href="login.html";
+}
+</script>
+</head>
+<body>
+
+<div class="dashboard-container">
+
+  <div class="sidebar">
+    <h2>Menu</h2>
+    <button onclick="loadContent('history')">📜 History</button>
+    <button onclick="loadContent('chat')">💬 Chat</button>
+    <button onclick="loadContent('mood')" class="active">😊 Mood</button>
+    <button onclick="loadContent('graph')">📊 Progress</button>
+    <button onclick="loadContent('test')">🧠 Test</button>
+    <button onclick="loadContent('help')">🆘 Help</button>
+    <button onclick="logout()" class="logout-btn">Logout</button>
+  </div>
+
+  <div class="main-content" id="main-content">
+    <div class="dashboard-main-card">
+        <h1>Welcome, <span id="userGreet"></span>!</h1>
+        <p class="quote">Choose an option from the menu to get started.</p>
+    </div>
+  </div>
+
+</div>
+
+<script src="script.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const username = localStorage.getItem("username") || "User";
+document.getElementById("userGreet").innerText = username;
+
+// Dynamic Content Loader
+function loadContent(section){
+    const main = document.getElementById("main-content");
+    
+    // Buttons active state fix
+    document.querySelectorAll('.sidebar button').forEach(btn => btn.classList.remove('active'));
+    
+    // Safety check for event to prevent errors
+    if(event && event.currentTarget) {
+        event.currentTarget.classList.add('active');
+    }
+
+    if(section==="history"){
+        main.innerHTML = `
+            <div class="dashboard-main-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 style="margin: 0;">📜 Your Activity Timeline</h2>
+                    <button onclick="clearUserHistory()" style="background: #ff4d4f; color: white; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: bold;">
+                        🗑️ Clear History
+                    </button>
+                </div>
+                <div id="timeline-container" style="max-height: 60vh; overflow-y: auto;">
+                </div>
+            </div>
+        `;
+        showHistory(); 
+        return;
+    }
+    
+    if(section==="chat"){
+        main.innerHTML = `
+            <h2>🤖 AI Chat Support</h2>
+            <div id="chatbot-container">
+                <zapier-interfaces-chatbot-embed 
+                  is-popup="false" 
+                  chatbot-id="cmkaxinj3005ap9mrnlwpz1ib" 
+                  height="600px" 
+                  width="100%">
+                </zapier-interfaces-chatbot-embed>
+            </div>
+        `;
+    }
+
+    /* --- MOOD SECTION UPDATED --- */
+    if(section==="mood"){
+        main.innerHTML = `
+            <div class="dashboard-main-card">
+                <h1>😊 How are you feeling?</h1>
+                <input type = "text" id ="moodNote" placeholder="Whats going on friend !" class = "mood-note-input">
+                <div class="mood-buttons-container">
+                    <button class="mood-btn happy" onclick="saveMood('Happy')"><span>😄</span>Happy</button>
+                    <button class="mood-btn neutral" onclick="saveMood('Neutral')"><span>😐</span>Neutral</button>
+                    <button class="mood-btn sad" onclick="saveMood('Sad')"><span>😔</span>Sad</button>
+                    <button class="mood-btn stressed" onclick="saveMood('Stressed')"><span>😣</span>Stressed</button>
+                </div>
+                
+                <div class="history-card">
+                    <h3>Previous Moods:</h3>
+                    <ul id="moodList" class="previous-moods-list"></ul>
+                </div>
+            </div>
+        `;
+        displayMoodHistory();
+    }
+
+    if(section==="graph"){
+        main.innerHTML = `
+            <div class="dashboard-main-card">
+                <h2>📊 Weekly Progress</h2>
+                <canvas id="progressChart" width="400" height="200"></canvas>
+            </div>
+        `;
+        renderChart();
+    }
+
+    if(section === "test"){
+    main.innerHTML = `
+        <div class="dashboard-main-card">
+            <h2>🧠 Mental Wellness Assessment</h2>
+            <p style="color: #666; margin-bottom: 20px;">Over the last 2 weeks, how often have you been bothered by any of the following problems?</p>
+            
+            <div id="quiz-container" style="text-align: left;">
+                <div class="quiz-scroll-area" style="max-height: 50vh; overflow-y: auto; padding-right: 10px;">
+                    ${generateQuestions()}
+                </div>
+                <button class="get-started-box" style="width:100%; margin-top: 20px;" onclick="checkSeverity()">Submit Assessment</button>
+            </div>
+            <div id="quiz-result" style="margin-top:20px; display:none;"></div>
+        </div>
+    `;
+}
+
+// Ye helper function questions generate karega
+function generateQuestions() {
+    const questions = [
+        "1. Little interest or pleasure in doing things?",
+        "2. Feeling down, depressed, or hopeless?",
+        "3. Trouble falling or staying asleep, or sleeping too much?",
+        "4. Feeling tired or having little energy?",
+        "5. Poor appetite or overeating?",
+        "6. Feeling bad about yourself — or that you are a failure?",
+        "7. Trouble concentrating on things, such as reading or watching TV?",
+        "8. Moving or speaking so slowly that other people could have noticed?",
+        "9. Thoughts that you would be better off dead, or of hurting yourself?",
+        "10. How difficult have these problems made it for you to do your work or get along with people?"
+    ];
+    
+    return questions.map((q, index) => `
+        <div class="quiz-question" style="margin-bottom: 20px;">
+            <p style="font-weight:600; color:#2c3e50; margin-bottom: 8px;">${q}</p>
+            <select id="q${index}" class="mood-note-input" style="width: 100%;">
+                <option value="0">Not at all</option>
+                <option value="1">Several days</option>
+                <option value="2">More than half the days</option>
+                <option value="3">Nearly every day</option>
+            </select>
+        </div>
+    `).join('');
+}
+
+    if(section === "help"){
+    main.innerHTML = `
+        <div class="dashboard-main-card" style="max-width: 800px;">
+            <h2>🆘 Help & Support Center</h2>
+            <p class="small-text">You are not alone. Reach out to these resources anytime.</p>
+            
+            <div class="help-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 20px; text-align: left;">
+                
+                <div class="help-item" style="background: #f0f7ff; padding: 15px; border-radius: 12px; border-left: 5px solid #007bff;">
+                    <h4 style="margin: 0 0 10px 0;">🏫 Campus Counselor</h4>
+                    <p style="font-size: 14px; margin-bottom: 10px;">Visit the ABES Wellness Center for a face-to-face talk.</p>
+                    <a href="mailto:counselor@mindlift.com" style="color: #007bff; font-weight: bold; text-decoration: none;">📧 counselor@mindlift.com</a>
+                </div>
+
+                <div class="help-item" style="background: #fff1f0; padding: 15px; border-radius: 12px; border-left: 5px solid #ff4d4f;">
+                    <h4 style="margin: 0 0 10px 0;">📞 Govt. Helpline (Kiran)</h4>
+                    <p style="font-size: 14px; margin-bottom: 10px;">24/7 National Mental Health Rehabilitation Helpline.</p>
+                    <a href="tel:18005990019" style="color: #cf1322; font-weight: bold; text-decoration: none;">📞 1800-599-0019</a>
+                </div>
+
+                <div class="help-item" style="background: #f6ffed; padding: 15px; border-radius: 12px; border-left: 5px solid #52c41a;">
+                    <h4 style="margin: 0 0 10px 0;">🤖 AI Support</h4>
+                    <p style="font-size: 14px; margin-bottom: 10px;">Talk to our AI bot for immediate venting and support.</p>
+                    <button onclick="loadContent('chat')" style="background: #52c41a; color: white; border: none; padding: 5px 15px; border-radius: 6px; cursor: pointer;">Start Chat</button>
+                </div>
+
+                <div class="help-item" style="background: #fff7e6; padding: 15px; border-radius: 12px; border-left: 5px solid #faad14;">
+                    <h4 style="margin: 0 0 10px 0;">🚨 Emergency</h4>
+                    <p style="font-size: 14px; margin-bottom: 10px;">For immediate medical emergencies or crises.</p>
+                    <span style="font-weight: bold; color: #d48806;">Call: 112 (National Emergency)</span>
+                </div>
+
+            </div>
+        </div>
+    `;
+}
+}
+
+// Clear History Function
+function clearUserHistory() {
+    const userPhone = localStorage.getItem("userPhone");
+    if (!userPhone) {
+        alert("Session expired, please login again.");
+        return;
+    }
+
+    if (confirm("Are you sure you want to delete all your mood history? This cannot be undone.")) {
+        const storageKey = `moods_${userPhone}`;
+        localStorage.removeItem(storageKey);
+        
+        // Refresh the History View
+        loadContent('history'); 
+        alert("History cleared successfully!");
+    }
+}
+
+// Weekly Progress Chart
+function renderChart(){
+    const canvas = document.getElementById('progressChart');
+    if(!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    
+    const userPhone = localStorage.getItem("userPhone"); 
+    const storageKey = `moods_${userPhone}`;
+    const moods = JSON.parse(localStorage.getItem(storageKey)) || [];
+    
+    const moodCounts = {Happy:0, Neutral:0, Sad:0, Stressed:0};
+    
+    moods.forEach(m => {
+        if(moodCounts[m.mood] !== undefined){
+            moodCounts[m.mood]++;
+        }
+    });
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: Object.keys(moodCounts),
+            datasets: [{
+                label: 'Mood Count',
+                data: Object.values(moodCounts),
+                backgroundColor: ['#4caf50','#ffc107','#2196f3','#f44336'],
+                borderRadius: 10
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: { beginAtZero: true, ticks: { stepSize: 1 } }
+            }
+        }
+    });
+}
+</script>
+
+<script async type="module" src="https://interfaces.zapier.com/assets/web-components/zapier-interfaces/zapier-interfaces.esm.js"></script>
+</body>
+</html>
