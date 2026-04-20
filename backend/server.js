@@ -22,12 +22,20 @@ mongoose.connect(process.env.MONGO_URI)
 app.use("/api/auth", require("./routes/auth"));
 
 /************************
-  FRONTEND SERVE
+  FRONTEND SERVE (FIXED FOR RENDER)
 *************************/
-app.use(express.static(path.join(__dirname, "frontend")));
 
+// IMPORTANT: absolute safe path for Render
+const frontendPath = path.join(process.cwd(), "backend", "frontend");
+
+// static files serve
+app.use(express.static(frontendPath));
+
+/************************
+  ROOT ROUTE
+*************************/
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "frontend", "index.html"));
+  res.sendFile(path.join(frontendPath, "index.html"));
 });
 
 /************************
