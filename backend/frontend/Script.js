@@ -1,7 +1,7 @@
 /************************
   API CONFIG
 *************************/
-const API_URL = "https://mindlift-3zmr.onrender.com";
+const API_URL = "https://mindlift-3zmr.onrender.com/api/auth";
 
 /************************
   REGISTER & LOGIN
