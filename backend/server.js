@@ -10,36 +10,32 @@ app.use(cors());
 app.use(express.json());
 
 /************************
-  DATABASE CONNECTION
+  DATABASE
 *************************/
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB Connected"))
   .catch(err => console.log(err));
 
 /************************
-  API ROUTES
+  ROUTES
 *************************/
 app.use("/api/auth", require("./routes/auth"));
 
 /************************
-  FRONTEND SERVE (FIXED FOR RENDER)
+  FRONTEND FIX (IMPORTANT)
 *************************/
 
-// IMPORTANT: absolute safe path for Render
-const frontendPath = path.join(process.cwd(), "backend", "frontend");
+// USE ONLY __dirname (NO process.cwd)
+const frontendPath = path.join(__dirname, "frontend");
 
-// static files serve
 app.use(express.static(frontendPath));
 
-/************************
-  ROOT ROUTE
-*************************/
 app.get("/", (req, res) => {
   res.sendFile(path.join(frontendPath, "index.html"));
 });
 
 /************************
-  SERVER START
+  START SERVER
 *************************/
 const PORT = process.env.PORT || 5000;
 
