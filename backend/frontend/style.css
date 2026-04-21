@@ -638,3 +638,156 @@ body {
 .help-item a:hover {
     opacity: 0.8;
 }
+
+/****************************
+ EXTRA RESPONSIVE FIX (ADDED ONLY)
+****************************/
+
+/* Tablets */
+@media (max-width: 1024px) {
+
+  .main-title {
+    font-size: 48px;
+  }
+
+  .landing-desc {
+    font-size: 18px;
+  }
+
+  .login-card {
+    width: 90%;
+    padding: 40px 25px;
+  }
+
+  .sidebar {
+    width: 250px;
+  }
+
+  .dashboard-main-card {
+    max-width: 90%;
+  }
+
+}
+
+/* Mobile Devices */
+@media (max-width: 600px) {
+
+  body {
+    padding: 10px;
+  }
+
+  /* Landing Page */
+  .landing {
+    padding: 25px 15px;
+    margin: 10px;
+  }
+
+  .main-title {
+    font-size: 36px;
+  }
+
+  .landing-desc {
+    font-size: 16px;
+  }
+
+  .get-started-box {
+    font-size: 18px;
+    padding: 14px 25px;
+  }
+
+  /* Login */
+  .login-card {
+    width: 95%;
+    padding: 30px 20px;
+    margin: 20px auto;
+  }
+
+  .login-card input,
+  .login-card button {
+    width: 100%;
+  }
+
+  /* Dashboard Layout */
+  .dashboard-container {
+    height: auto;
+  }
+
+  .sidebar {
+    flex-direction: row;
+    width: 100%;
+    height: auto;
+    margin: 0;
+    border-radius: 0;
+    overflow-x: auto;
+    box-shadow: none;
+  }
+
+  .sidebar h2 {
+    display: none;
+  }
+
+  .sidebar button {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  .main-content {
+    padding: 15px;
+  }
+
+  .dashboard-main-card {
+    padding: 20px;
+    border-radius: 18px;
+  }
+
+  .dashboard-main-card h1 {
+    font-size: 22px;
+  }
+
+  .quote {
+    font-size: 14px;
+  }
+
+  /* Chat */
+  .chat-card {
+    padding: 20px;
+    width: 100%;
+  }
+
+  #chatBox {
+    min-height: 180px;
+    max-height: 250px;
+    font-size: 14px;
+  }
+
+  /* Mood Buttons */
+  .mood-buttons-container {
+    grid-template-columns: repeat(auto-fit, minmax(90px,1fr));
+    gap: 12px;
+  }
+
+  .mood-btn {
+    padding: 18px 10px;
+  }
+
+  .mood-btn span {
+    font-size: 32px;
+  }
+
+  /* History */
+  .history-card {
+    padding: 15px;
+  }
+
+  .previous-moods-list li {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  /* Help Grid */
+  .help-grid {
+    grid-template-columns: 1fr;
+  }
+
+}
